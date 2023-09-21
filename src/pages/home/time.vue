@@ -37,7 +37,7 @@ import { ref } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 const input2 = ref('')
 const handleClick = () => {
-    console.log('click')
+    window.alert(1);
 }
 const tableData = [
     {

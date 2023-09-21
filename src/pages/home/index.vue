@@ -3,7 +3,7 @@
         <div class="demo-input-size">
             <el-input v-model="input2" class="w-50 m-2" placeholder="无人机序号" :suffix-icon="Search" />
         </div>
-        <el-button type="primary" class="add" @click="handleClick">
+        <el-button type="primary" class="add" @click="dialogFormVisible = true">
             新增&#160;
             <el-icon>
                 <CirclePlus />
@@ -11,11 +11,12 @@
         </el-button>
     </div>
     <el-table :data="tableData" size="large" style="width: 100%;" stripe class="table">
-        <el-table-column fixed prop="date" label="无人机序号✈️" width="130" align="center"/>
-        <el-table-column prop="name" label="类型" width="200" align="center"/>
-        <el-table-column prop="state" label="图片📷" width="220" align="center"/>
-        <el-table-column prop="address" label="存放地点🏫" width="400" align="center"/>
-        <el-table-column prop="zip" label="状态" width="200" align="center"/>
+        <el-table-column fixed prop="number" label="无人机序号✈️" width="130" align="center" />
+        <el-table-column prop="type" label="类型" width="200" align="center" />
+        <el-table-column prop="photo" label="图片📷" width="220" align="center" />
+        <el-table-column prop="address" label="存放地点🏫" width="300" align="center" />
+        <el-table-column prop="time" label="最大租赁时间⏱️" width="150" align="center" />
+        <el-table-column prop="status" label="状态" width="150" align="center" />
         <el-table-column fixed="right" label="操作🕹️" min-width="100" align="center">
             <template #default>
                 <el-button type="primary" @click="handleClick">
@@ -32,24 +33,117 @@
             :background="background" layout="prev, pager, next, jumper" :total="1000" @size-change="handleSizeChange"
             @current-change="handleCurrentChange" />
     </div>
+
+    <el-dialog v-model="dialogFormVisible" title="新增无人机">
+        <el-form :model="form" class="dialog">
+            <el-form-item label="无人机序号" :label-width="formLabelWidth">
+                <el-input v-model="form.number" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="无人机类型" :label-width="formLabelWidth">
+                <el-input v-model="form.type" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="无人机照片" :label-width="formLabelWidth">
+                <el-upload action="#" list-type="picture-card" :auto-upload="false">
+                    <el-icon>
+                        <Picture />
+                    </el-icon>
+
+                    <template #file="{ file }">
+                        <div>
+                            <img class="el-upload-list__item-thumbnail" :src="file.url" alt="" />
+                            <span class="el-upload-list__item-actions">
+                                <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
+                                    <el-icon><zoom-in /></el-icon>
+                                </span>
+                                <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleDownload(file)">
+                                    <el-icon>
+                                        <Download />
+                                    </el-icon>
+                                </span>
+                                <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleRemove(file)">
+                                    <el-icon>
+                                        <Delete />
+                                    </el-icon>
+                                </span>
+                            </span>
+                        </div>
+                    </template>
+                </el-upload>
+            </el-form-item>
+            <el-form-item label="最大租赁时间" :label-width="formLabelWidth">
+                <el-input v-model="form.time" placeholder="">
+                    <template #append>/小时</template>
+                </el-input>
+            </el-form-item>
+            <!-- <el-form-item label="存放地点" :label-width="formLabelWidth">
+                <el-input v-model="form.address" autocomplete="off" />
+            </el-form-item> -->
+            <el-form-item label="存放地点" :label-width="formLabelWidth">
+                <el-select v-model="form.address" placeholder="选择一个地点">
+                    <el-option label="A校区-C栋-101" value="A校区-C栋-101" />
+                    <el-option label="B校区-D栋-103" value="B校区-D栋-103" />
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="dialogFormVisible = false">
+                    Confirm
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
+    <el-dialog v-model="dialogVisible">
+        <img w-full :src="dialogImageUrl" alt="Preview Image" />
+    </el-dialog>
 </template>
   
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { Search } from '@element-plus/icons-vue'
+import { reactive, ref } from 'vue'
+import { Delete, Download, Plus, ZoomIn, Search } from '@element-plus/icons-vue'
+import type { UploadFile } from 'element-plus'
+
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
+
+const handleRemove = (file: UploadFile) => {
+    console.log(file)
+}
+
+const handlePictureCardPreview = (file: UploadFile) => {
+    dialogImageUrl.value = file.url!
+    dialogVisible.value = true
+}
+
+const handleDownload = (file: UploadFile) => {
+    console.log(file)
+}
+const dialogFormVisible = ref(false)
+const formLabelWidth = '150px'
+
+const form = reactive({
+
+    number: '',
+    type: '',
+    photo: '',
+    time: '',
+    address: ''
+})
+
 const input2 = ref('')
 const handleClick = () => {
     console.log('click')
 }
+
 const tableData = [
     {
-        date: '2016-05-03',
-        name: 'Tom',
-        state: 'California',
-        city: 'Los Angeles',
+        number: '',
+        type: '',
+        photo: '',
         address: 'No. 189, Grove St, Los Angeles',
-        zip: 'CA 90036',
-        tag: 'Home',
+        time: '',
+        status: '',
     },
     {
         date: '2016-05-02',
@@ -103,6 +197,10 @@ const handleCurrentChange = (val: number) => {
     .add {
         margin-right: 20px;
     }
+}
+
+.dialog {
+    padding: 0 150px 0 0;
 }
 
 .demo-pagination-block {
