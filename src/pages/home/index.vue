@@ -376,7 +376,7 @@ const tableData = [
 const disabled = ref(false)
 const page = reactive({
     currentPage: 1,
-    pageSize: 10,
+    pageSize: 5,
     total: tableData.length
 })
 const ftableData = () => {
