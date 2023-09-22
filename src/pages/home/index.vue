@@ -13,18 +13,25 @@
     <el-table :data="tableData" size="large" style="width: 100%;" stripe class="table">
         <el-table-column fixed prop="number" label="无人机序号✈️" width="130" align="center" />
         <el-table-column prop="type" label="类型" width="200" align="center" />
-        <el-table-column prop="photo" label="图片📷" width="220" align="center" />
-        <el-table-column prop="address" label="存放地点🏫" width="300" align="center" />
-        <el-table-column prop="time" label="最大租赁时间⏱️" width="150" align="center" />
-        <el-table-column prop="status" label="状态" width="150" align="center" />
-        <el-table-column fixed="right" label="操作🕹️" min-width="100" align="center">
-            <template #default>
-                <el-button type="primary" @click="handleClick">
+        <el-table-column prop="photo" label="图片📷" width="150" align="center" />
+        <el-table-column prop="address" label="存放地点🏫" width="200" align="center" />
+        <el-table-column prop="time" label="最大租赁时间⏱️" width="200" align="center" />
+        <el-table-column prop="status" label="状态" width="180" align="center">
+            <template #default="scope">
+                <span>{{ scope.row.status === 1 ? "在库" : '已借出' }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column fixed="right" label="操作🕹️" min-width="150" align="center">
+            <template #default="scope">
+                <el-button type="primary" @click="borrowFormVisible = true" :disabled="scope.row.status === 0">
                     借出<el-icon class="el-icon--right">
                         <Upload />
                     </el-icon>
                 </el-button>
-                <!-- <el-button link type="primary" size="large">Edit</el-button> -->
+                <el-button type="primary" @click="scope.row.status = 1" :disabled="scope.row.status === 1">
+                    归还&#160;
+                    <el-icon><Select /></el-icon>
+                </el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -47,7 +54,6 @@
                     <el-icon>
                         <Picture />
                     </el-icon>
-
                     <template #file="{ file }">
                         <div>
                             <img class="el-upload-list__item-thumbnail" :src="file.url" alt="" />
@@ -97,10 +103,35 @@
     <el-dialog v-model="dialogVisible">
         <img w-full :src="dialogImageUrl" alt="Preview Image" />
     </el-dialog>
+
+    <el-dialog v-model="borrowFormVisible" title="租借无人机" width="40%" class="borrowDialog">
+        <el-form :model="form" class="dialog">
+            <el-form-item label="姓名" :label-width="formLabelWidth">
+                <el-input v-model="form.name" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="电话" :label-width="formLabelWidth">
+                <el-input v-model="form.phone" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="学号" :label-width="formLabelWidth">
+                <el-input v-model="form.stuId" autocomplete="off" />
+            </el-form-item>
+            <!-- <el-form-item label="存放地点" :label-width="formLabelWidth">
+                <el-input v-model="form.address" autocomplete="off" />
+            </el-form-item> -->
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="borrowFormVisible = false">取消</el-button>
+                <el-button type="primary" @click="borrow">
+                    借出
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
   
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { onScopeDispose, reactive, ref } from 'vue'
 import { Delete, Download, Plus, ZoomIn, Search } from '@element-plus/icons-vue'
 import type { UploadFile } from 'element-plus'
 
@@ -120,10 +151,13 @@ const handleDownload = (file: UploadFile) => {
     console.log(file)
 }
 const dialogFormVisible = ref(false)
+const borrowFormVisible = ref(false)
 const formLabelWidth = '150px'
 
 const form = reactive({
-
+    name: '',
+    phone: '',
+    stuId: '',
     number: '',
     type: '',
     photo: '',
@@ -136,42 +170,69 @@ const handleClick = () => {
     console.log('click')
 }
 
+const borrow = () => {
+    borrowFormVisible.value = false
+
+}
+
+
 const tableData = [
     {
-        number: '',
-        type: '',
+        number: 'Rd-001',
+        type: '旋翼',
         photo: '',
-        address: 'No. 189, Grove St, Los Angeles',
-        time: '',
-        status: '',
+        address: 'A校区-C栋-101',
+        time: '72:00',
+        status: 1,
     },
     {
-        date: '2016-05-02',
-        name: 'Tom',
-        state: 'California',
-        city: 'Los Angeles',
-        address: 'No. 189, Grove St, Los Angeles',
-        zip: 'CA 90036',
-        tag: 'Office',
+        number: 'Rd-002',
+        type: '旋翼',
+        photo: '',
+        address: 'A校区-C栋-101',
+        time: '72:00',
+        status: 1,
     },
     {
-        date: '2016-05-04',
-        name: 'Tom',
-        state: 'California',
-        city: 'Los Angeles',
-        address: 'No. 189, Grove St, Los Angeles',
-        zip: 'CA 90036',
-        tag: 'Home',
+        number: 'Fwd-001',
+        type: '固定翼',
+        photo: '',
+        address: 'A校区-C栋-101',
+        time: '48:00',
+        status: 1,
     },
     {
-        date: '2016-05-01',
-        name: 'Tom',
-        state: 'California',
-        city: 'Los Angeles',
-        address: 'No. 189, Grove St, Los Angeles',
-        zip: 'CA 90036',
-        tag: 'Office',
+        number: 'Fwd-002',
+        type: '固定翼',
+        photo: '',
+        address: 'A校区-C栋-101',
+        time: '48:00',
+        status: 1,
     },
+    {
+        number: 'Rd-003',
+        type: '旋翼',
+        photo: '',
+        address: 'A校区-C栋-101',
+        time: '72:00',
+        status: 1,
+    },
+    {
+        number: 'Rd-004',
+        type: '旋翼',
+        photo: '',
+        address: 'A校区-C栋-101',
+        time: '72:00',
+        status: 1,
+    },
+    {
+        number: 'Fwd-003',
+        type: '固定翼',
+        photo: '',
+        address: 'A校区-C栋-101',
+        time: '48:00',
+        status: 0
+    }
 ]
 const currentPage3 = ref(1)
 const pageSize3 = ref(100)
@@ -198,6 +259,8 @@ const handleCurrentChange = (val: number) => {
         margin-right: 20px;
     }
 }
+
+.borrowDialog {}
 
 .dialog {
     padding: 0 150px 0 0;
