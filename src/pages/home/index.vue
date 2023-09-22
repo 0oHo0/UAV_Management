@@ -10,10 +10,17 @@
             </el-icon>
         </el-button>
     </div>
-    <el-table :data="tableData" size="large" style="width: 100%;" stripe class="table">
+
+    <el-table :data="ftableData()" size="large" style="width: 100%;" stripe class="table">
         <el-table-column fixed prop="number" label="无人机序号✈️" width="130" align="center" />
         <el-table-column prop="type" label="类型" width="200" align="center" />
-        <el-table-column prop="photo" label="图片📷" width="150" align="center" />
+        <el-table-column prop="photo" label="图片📷" width="200" align="center">
+            <template #default="scope">
+                <div style="display: inline-block;">
+                    <el-image style="width: 70px;" fit="fill" :src="getImageUrl(scope.row.photo)"></el-image>
+                </div>
+            </template>
+        </el-table-column>
         <el-table-column prop="address" label="存放地点🏫" width="200" align="center" />
         <el-table-column prop="time" label="最大租赁时间⏱️" width="200" align="center" />
         <el-table-column prop="status" label="状态" width="180" align="center">
@@ -28,17 +35,15 @@
                         <Upload />
                     </el-icon>
                 </el-button>
-                <el-button type="primary" @click="scope.row.status = 1" :disabled="scope.row.status === 1">
-                    归还&#160;
-                    <el-icon><Select /></el-icon>
-                </el-button>
             </template>
         </el-table-column>
     </el-table>
     <div class="demo-pagination-block">
-        <el-pagination v-model:current-page="currentPage3" v-model:page-size="pageSize3" :small="small" :disabled="disabled"
-            :background="background" layout="prev, pager, next, jumper" :total="1000" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" />
+        <el-config-provider :locale="locale">
+            <el-pagination v-model:current-page="page.currentPage" :page-size="page.pageSize" :page-sizes="[5, 10, 15, 20]"
+                :small="false" :disabled="disabled" :background="true" layout="total, sizes, prev, pager, next, jumper"
+                :total="page.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        </el-config-provider>
     </div>
 
     <el-dialog v-model="dialogFormVisible" title="新增无人机">
@@ -105,15 +110,15 @@
     </el-dialog>
 
     <el-dialog v-model="borrowFormVisible" title="租借无人机" width="40%" class="borrowDialog">
-        <el-form :model="form" class="dialog">
-            <el-form-item label="姓名" :label-width="formLabelWidth">
-                <el-input v-model="form.name" autocomplete="off" />
+        <el-form ref="ruleFormRef" :model="ruleForm" class="dialog" :rules="rules">
+            <el-form-item label="姓名" :label-width="formLabelWidth" prop="name">
+                <el-input v-model="ruleForm.name" autocomplete="off" clearable="true" />
             </el-form-item>
-            <el-form-item label="电话" :label-width="formLabelWidth">
-                <el-input v-model="form.phone" autocomplete="off" />
+            <el-form-item label="电话" :label-width="formLabelWidth" prop="phone">
+                <el-input v-model="ruleForm.phone" autocomplete="off" clearable="true" />
             </el-form-item>
-            <el-form-item label="学号" :label-width="formLabelWidth">
-                <el-input v-model="form.stuId" autocomplete="off" />
+            <el-form-item label="学号" :label-width="formLabelWidth" prop="stuId">
+                <el-input v-model="ruleForm.stuId" autocomplete="off" clearable="true" />
             </el-form-item>
             <!-- <el-form-item label="存放地点" :label-width="formLabelWidth">
                 <el-input v-model="form.address" autocomplete="off" />
@@ -122,9 +127,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="borrowFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="borrow">
-                    借出
-                </el-button>
+                <el-button type="primary" @click="submitForm(ruleFormRef)">借出</el-button>
             </span>
         </template>
     </el-dialog>
@@ -133,8 +136,21 @@
 <script lang="ts" setup>
 import { onScopeDispose, reactive, ref } from 'vue'
 import { Delete, Download, Plus, ZoomIn, Search } from '@element-plus/icons-vue'
-import type { UploadFile } from 'element-plus'
+import type { UploadFile, FormRules, FormInstance } from 'element-plus'
+import zhCn from "element-plus/es/locale/lang/zh-cn";
+let locale = zhCn;
 
+interface RuleForm {
+    name: string
+    type: string
+    phone: string
+    stuId: string
+    number: string
+    photo: string
+    time: string
+    address: string
+}
+const ruleFormRef = ref<FormInstance>()
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 
@@ -165,87 +181,225 @@ const form = reactive({
     address: ''
 })
 
+const ruleForm = reactive<RuleForm>({
+    name: '',
+    phone: '',
+    stuId: '',
+    number: '',
+    type: '',
+    photo: '',
+    time: '',
+    address: ''
+})
+
+
 const input2 = ref('')
-const handleClick = () => {
-    console.log('click')
+const
+    handleClick = () => {
+        console.log('click')
+    }
+
+const submitForm = (formEl: FormInstance | undefined) => {
+    if (!formEl) return
+    formEl.validate((valid) => {
+        if (valid) {
+            console.log('submit!')
+            borrowFormVisible.value = false
+
+        } else {
+            console.log('error submit!')
+            return false
+        }
+    })
 }
 
-const borrow = () => {
-    borrowFormVisible.value = false
-
-}
-
-
+const rules = reactive<FormRules<RuleForm>>({
+    name: [
+        { required: true, message: '请输入姓名', trigger: 'blur' },
+        { min: 3, max: 5, message: '请输入正确姓名', trigger: 'blur' },
+    ],
+    phone: [
+        { required: true, message: '请输入手机号', trigger: 'blur' },
+        { min: 11, max: 11, message: '请输入正确的手机号', trigger: 'blur' },
+    ],
+    stuId: [
+        { required: true, message: '请输入学号', trigger: 'blur' },
+        { min: 13, max: 13, message: '请输入正确的学号', trigger: 'blur' },
+    ]
+})
 const tableData = [
     {
-        number: 'Rd-001',
+        number: 'RD-001',
         type: '旋翼',
-        photo: '',
+        photo: 'UAV.png',
         address: 'A校区-C栋-101',
         time: '72:00',
         status: 1,
     },
     {
-        number: 'Rd-002',
+        number: 'RD-002',
         type: '旋翼',
-        photo: '',
-        address: 'A校区-C栋-101',
+        photo: 'RD-002.png',
+        address: 'B校区-D栋-103',
         time: '72:00',
         status: 1,
     },
     {
-        number: 'Fwd-001',
+        number: 'FWD-001',
         type: '固定翼',
-        photo: '',
+        photo: 'FWD-001.png',
         address: 'A校区-C栋-101',
         time: '48:00',
         status: 1,
     },
     {
-        number: 'Fwd-002',
+        number: 'FWD-002',
         type: '固定翼',
-        photo: '',
-        address: 'A校区-C栋-101',
+        photo: 'FWD-002.png',
+        address: 'B校区-D栋-103',
         time: '48:00',
         status: 1,
     },
     {
-        number: 'Rd-003',
+        number: 'RD-003',
         type: '旋翼',
-        photo: '',
+        photo: 'RD-003.png',
+        address: 'B校区-D栋-103',
+        time: '72:00',
+        status: 1,
+    },
+    {
+        number: 'RD-004',
+        type: '旋翼',
+        photo: 'RD-004.png',
         address: 'A校区-C栋-101',
         time: '72:00',
         status: 1,
     },
     {
-        number: 'Rd-004',
-        type: '旋翼',
-        photo: '',
-        address: 'A校区-C栋-101',
-        time: '72:00',
-        status: 1,
-    },
-    {
-        number: 'Fwd-003',
+        number: 'FWD-003',
         type: '固定翼',
-        photo: '',
-        address: 'A校区-C栋-101',
+        photo: 'FWD-003.png',
+        address: 'B校区-D栋-103',
         time: '48:00',
         status: 0
-    }
+    },
+    {
+        number: 'FWD-004',
+        type: '固定翼',
+        photo: 'FWD-004.png',
+        address: 'B校区-D栋-103',
+        time: '48:00',
+        status: 0
+    },
+    {
+        number: 'FWD-005',
+        type: '固定翼',
+        photo: 'FWD-005.png',
+        address: 'B校区-D栋-103',
+        time: '48:00',
+        status: 0
+    },
+    {
+        number: 'FWD-006',
+        type: '固定翼',
+        photo: 'FWD-006.png',
+        address: 'B校区-D栋-103',
+        time: '48:00',
+        status: 0
+    },
+    {
+        number: 'FWD-007',
+        type: '固定翼',
+        photo: 'FWD-007.png',
+        address: 'B校区-D栋-103',
+        time: '48:00',
+        status: 0
+    },
+    {
+        number: 'RD-005',
+        type: '旋翼',
+        photo: 'RD-005.png',
+        address: 'B校区-D栋-103',
+        time: '72:00',
+        status: 0
+    },
+    {
+        number: 'RD-006',
+        type: '旋翼',
+        photo: 'RD-006.png',
+        address: 'B校区-D栋-103',
+        time: '72:00',
+        status: 0
+    },
+    {
+        number: 'RD-007',
+        type: '旋翼',
+        photo: 'RD-007.png',
+        address: 'B校区-D栋-103',
+        time: '72:00',
+        status: 0
+    },
+    {
+        number: 'RD-008',
+        type: '旋翼',
+        photo: 'RD-008.png',
+        address: 'B校区-D栋-103',
+        time: '72:00',
+        status: 0
+    },
+    {
+        number: 'RD-009',
+        type: '旋翼',
+        photo: 'RD-005.png',
+        address: 'B校区-D栋-103',
+        time: '72:00',
+        status: 0
+    },
+    {
+        number: 'RD-010',
+        type: '旋翼',
+        photo: 'RD-003.png',
+        address: 'B校区-D栋-103',
+        time: '72:00',
+        status: 0
+    },
+    {
+        number: 'RD-011',
+        type: '旋翼',
+        photo: 'RD-006.png',
+        address: 'B校区-D栋-103',
+        time: '72:00',
+        status: 0
+    },
 ]
-const currentPage3 = ref(1)
-const pageSize3 = ref(100)
-const small = ref(false)
-const background = ref(false)
 const disabled = ref(false)
+const page = reactive({
+    currentPage: 1,
+    pageSize: 10,
+    total: tableData.length
+})
+const ftableData = () => {
+    return tableData.filter(
+        (item, index) =>
+            index < page.currentPage * page.pageSize &&
+            index >= page.pageSize * (page.currentPage - 1)
+    );
+};
+const handleSizeChange = (e) => {
+    page.currentPage = 1;
+    page.pageSize = e;
+    console.log(`${e} items per page`)
+}
+const handleCurrentChange = (e) => {
+    console.log(`current page: ${e}`)
+    page.currentPage = e;
+}
 
-const handleSizeChange = (val: number) => {
-    console.log(`${val} items per page`)
-}
-const handleCurrentChange = (val: number) => {
-    console.log(`current page: ${val}`)
-}
+const host = window.location.host;
+const getImageUrl = name => {
+    return `http://${host}/src/assets/image/${name}`;
+};
 </script>
   
 <style scoped>

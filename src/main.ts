@@ -9,6 +9,7 @@ import 'element-plus/dist/index.css'
 import '@/style/reset.scss'
 import router from '@/router'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import locale from 'element-plus/lib/locale/lang/zh-cn' 
 const app = createApp(App);
 app.use(ElementPlus)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

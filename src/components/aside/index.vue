@@ -1,7 +1,7 @@
 <template>
   <div class="aside">
     <div class="title">
-      <img src="@/assets/UAV.png" alt="Logo" class="image">
+      <img src="@/assets/image/logo.png" alt="Logo" class="image">
       <el-text size="large" type="primary" tag="sub">无人机管理系统</el-text>
     </div>
     <el-menu router
