@@ -3,24 +3,28 @@ export default createRouter({
     history: createWebHistory(),
     routes: [
         {
+            path: '/index',
+            component: () => import('@/components/pages/index.vue')
+        },
+        {
             path: '/home',
-            component: () => import('@/pages/home/index.vue')
+            component: () => import('@/components/pages/home/index.vue')
         },
         {
             path: '/login',
-            component: () => import('@/pages/login/index.vue')
+            component: () => import('@/components/pages/login.vue')
         },
         {
             path: '/time',
-            component: () => import('@/pages/home/time.vue')
+            component: () => import('@/components/pages/home/time.vue')
         },
         {
             path: '/people',
-            component: () => import('@/pages/home/people.vue')
+            component: () => import('@/components/pages/home/people.vue')
         },
         {
             path: '/',
-            redirect:'/home'
+            redirect: '/login'
         }
     ],
     scrollBehavior() {

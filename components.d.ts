@@ -7,7 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    Aside: typeof import('./src/components/aside/index.vue')['default']
+    Aside: typeof import('./src/components/pages/aside.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
@@ -43,8 +43,13 @@ declare module 'vue' {
     ElTag: typeof import('element-plus/es')['ElTag']
     ElText: typeof import('element-plus/es')['ElText']
     ElUpload: typeof import('element-plus/es')['ElUpload']
+    Home: typeof import('./src/components/pages/home/index.vue')['default']
+    Login: typeof import('./src/components/pages/login.vue')['default']
+    Pages: typeof import('./src/components/pages/index.vue')['default']
+    People: typeof import('./src/components/pages/home/people.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    Top: typeof import('./src/components/top/index.vue')['default']
+    Time: typeof import('./src/components/pages/home/time.vue')['default']
+    Top: typeof import('./src/components/pages/top.vue')['default']
   }
 }
