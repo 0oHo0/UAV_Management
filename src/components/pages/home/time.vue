@@ -7,10 +7,10 @@
         </div>
         <el-table :data="ftableData()" size="large" max-height="560" style="width: 100%;" stripe class="table">
             <el-table-column fixed prop="number" label="无人机编号✈️" width="130" align="center" />
-            <el-table-column prop="time" label="租赁时间⏱️" width="270" align="center" />
+            <el-table-column prop="time" label="租借时间⏱️" width="270" align="center" />
             <el-table-column prop="remainder" label="剩余时间⏱️" width="220" align="center" />
             <el-table-column prop="address" label="归还地点🏫" width="300" align="center" />
-            <el-table-column prop="name" label="租赁人员🧑🏻‍🎓" width="180" align="center" />
+            <el-table-column prop="name" label="租借人员🧑🏻‍🎓" width="180" align="center" />
             <el-table-column fixed="right" label="操作🕹️" min-width="120" align="center">
                 <template #default>
                     <el-button type="primary" @click="centerDialogVisible = true">

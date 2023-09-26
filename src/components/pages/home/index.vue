@@ -22,7 +22,7 @@
                 </template>
             </el-table-column>
             <el-table-column prop="address" label="存放地点🏫" width="200" align="center" />
-            <el-table-column prop="time" label="最大租赁时间⏱️" width="200" align="center" />
+            <el-table-column prop="time" label="最大租借时间⏱️" width="200" align="center" />
             <el-table-column prop="status" label="状态" width="180" align="center">
                 <template #default="scope">
                     <span>{{ scope.row.status === 1 ? "在库" : '已借出' }}</span>

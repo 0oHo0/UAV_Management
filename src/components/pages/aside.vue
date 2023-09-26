@@ -16,13 +16,13 @@
         <el-icon>
           <Clock />
         </el-icon>
-        <span>租赁时间管理</span>
+        <span>租借时间管理</span>
       </el-menu-item>
       <el-menu-item index="/people">
         <el-icon>
           <User />
         </el-icon>
-        <span>租赁人员管理</span>
+        <span>租借人员管理</span>
       </el-menu-item>
     </el-menu>
   </div>
