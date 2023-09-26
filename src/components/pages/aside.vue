@@ -4,9 +4,8 @@
       <img src="@/assets/image/logo.png" alt="Logo" class="image">
       <el-text size="large" type="primary" tag="sub">无人机管理系统</el-text>
     </div>
-    <el-menu router
-       :collapse='false' default-active="/home" class="el-menu-vertical-demo" active-text-color="#409EFF" background-color=#ffffff
-      text-color="#000" @open="handleOpen" @close="handleClose">
+    <el-menu router='ture' :collapse='false' default-active="/home" class="el-menu-vertical-demo"
+      active-text-color="#409EFF" background-color=#ffffff text-color="#000" @open="handleOpen" @close="handleClose">
       <el-menu-item index="/home">
         <el-icon>
           <House />

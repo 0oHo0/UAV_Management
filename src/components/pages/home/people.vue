@@ -1,21 +1,11 @@
 <template>
 <div class="container">
-    <el-container>
-      <el-aside width="200px" class="aside">
-        <asid />  
-      </el-aside>
-      <el-container>
-        <el-header>
-          <top />
-        </el-header>
-        <el-main>
-        <div class="body">
     <div class="top">
         <div class="demo-input-size">
             <el-input v-model="input2" class="w-50 m-2" placeholder="学生姓名" :suffix-icon="Search" />
         </div>
     </div>
-    <el-table :data="ftableData()" size="large" style="width: 100%;" stripe class="table">
+    <el-table :data="ftableData()" size="large" max-height="560" style="width: 100%;" stripe class="table">
         <el-table-column fixed prop="name" label="姓名🧑🏻‍🎓" width="100" align="center" />
         <el-table-column prop="number" label="无人机编号✈️" width="240" align="center" />
         <el-table-column prop="phone" label="电话📞" width="220" align="center" />
@@ -23,7 +13,7 @@
         <el-table-column prop="class" label="班级" width="200" align="center" />
         <el-table-column fixed="right" label="操作🕹️" min-width="100" align="center">
             <template #default>
-                <el-button type="primary" @click="handleClick">
+                <el-button type="primary" @click="centerDialogVisible = true">
                     归还&#160;<el-icon><Select /></el-icon>
                 </el-button>
                 <!-- <el-button link type="primary" size="large">Edit</el-button> -->
@@ -34,14 +24,21 @@
         <el-config-provider :locale="locale">
             <el-pagination v-model:current-page="page.currentPage" :page-size="page.pageSize" :page-sizes="[5, 10, 15, 20]"
                 :small="false" :disabled="disabled" :background="true" layout="total, sizes, prev, pager, next, jumper"
-                :total="page.total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+                :total="tableTotal()" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </el-config-provider>
     </div>
-</div>  
-          </el-main>
-        </el-container>
-      </el-container>
-    </div>
+</div>
+    <el-dialog v-model="centerDialogVisible" title="请确认" width="20%" center>
+        <el-text class="mx-1" type="danger" size="large">学生是否已归还</el-text>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="centerDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="centerDialogVisible = false">
+                    确认
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
   
 <script lang="ts" setup>
@@ -50,10 +47,8 @@ import { Search } from '@element-plus/icons-vue'
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 let locale = zhCn;
 
+const centerDialogVisible = ref(false)
 const input2 = ref('')
-const handleClick = () => {
-    console.log('click')
-}
 const tableData = [
     {
         name: '同学A',
@@ -119,19 +114,21 @@ const tableData = [
         class: '仪器201',
     },
 ]
-
 const disabled = ref(false)
-
 const page = reactive({
     currentPage: 1,
     pageSize: 5,
     total: tableData.length
 })
+const tableTotal = () => {
+    return input2.value != '' ? ftableData().length : tableData.length;
+}
 const ftableData = () => {
     return tableData.filter(
         (item, index) =>
             index < page.currentPage * page.pageSize &&
-            index >= page.pageSize * (page.currentPage - 1)
+                index >= page.pageSize * (page.currentPage - 1) &&
+                input2.value === '' ? 1 : item.name == input2.value
     );
 };
 const handleSizeChange = (e) => {
@@ -143,18 +140,26 @@ const handleCurrentChange = (e) => {
     console.log(`current page: ${e}`)
     page.currentPage = e;
 }
+
 </script>
-  
+
 <style scoped>
-.container{
+.container {
     height: 100vh;
-    .aside{
-      height: 100vh;
+
+    .aside {
+        height: 100vh;
     }
-    .body{
-      padding: 5px;
+
+    .body {
+        padding: 5px;
     }
-  }
+}
+
+.dialog-footer button:first-child {
+    margin-right: 10px;
+}
+
 .top {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -165,6 +170,11 @@ const handleCurrentChange = (e) => {
     .add {
         margin-right: 20px;
     }
+}
+
+.mx-1 {
+    display: flex;
+    justify-content: center;
 }
 
 .demo-pagination-block {

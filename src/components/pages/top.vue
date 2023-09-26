@@ -10,14 +10,29 @@
       <el-tag>Default</el-tag>
     </div>
     <div class="right">
-      <el-button type="primary" class="ml-2">登出</el-button>
+      <el-button type="primary" class="ml-2" @click="logout">
+        登出&#160; <el-icon>
+          <SwitchButton />
+        </el-icon>
+      </el-button>
     </div>
   </div>
   <el-divider border-style="double" class="divide" />
 </template>
 
   
-<script lang="ts" setup>
+<script>
+import router from "@/router";
+export default {
+  methods: {
+    logout() {
+      console.log('登出成功');
+      this.$store.commit('setLoggedIn', false);
+      // 登录成功后跳转到首页            
+      this.$router.replace('/login');
+    }
+  }
+}
 
 </script>
 <style scoped>
@@ -30,12 +45,13 @@
     justify-content: center;
     align-items: center;
     height: 10vh;
+
     .image {
       width: 40px;
       height: auto;
       margin-right: 5px;
     }
-  
+
     .text-mr-3 {
       font-size: 15px;
     }

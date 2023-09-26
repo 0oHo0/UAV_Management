@@ -4,23 +4,23 @@ export default createRouter({
     routes: [
         {
             path: '/index',
-            component: () => import('@/components/pages/index.vue')
+            component: () => import('@/components/pages/index.vue'),
         },
         {
             path: '/home',
-            component: () => import('@/components/pages/home/index.vue')
+            component: () => import('@/components/pages/home/index.vue'),
         },
         {
             path: '/login',
-            component: () => import('@/components/pages/login.vue')
+            component: () => import('@/components/pages/login.vue'),
         },
         {
             path: '/time',
-            component: () => import('@/components/pages/home/time.vue')
+            component: () => import('@/components/pages/home/time.vue'),
         },
         {
             path: '/people',
-            component: () => import('@/components/pages/home/people.vue')
+            component: () => import('@/components/pages/home/people.vue'),
         },
         {
             path: '/',

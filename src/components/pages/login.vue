@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container" v-if="!isLoggedIn">
         <el-text class="mx-1" type="primary" size="large">无人机管理系统</el-text>
         <div class="radius">
             <div class="login-container">
@@ -16,7 +16,6 @@
                 </el-form>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -46,14 +45,20 @@ export default {
                 if (valid) {
                     // 登录逻辑，可以发送请求到后端进行验证
                     console.log('登录成功');
+                    this.$store.commit('setLoggedIn', true);
                     // 登录成功后跳转到首页            
-                    this.$router.push('/home');
+                    this.$router.replace('/home');
                 } else {
                     console.log('表单验证失败');
                 }
             });
         }
+    },
+    computed: {
+    isLoggedIn() {
+      return this.$store.state.isLoggedIn;
     }
+  }
 };
 </script>
   
@@ -62,9 +67,7 @@ export default {
     position: relative;
     align-items: center;
     height: 100vh;
-    /* 设置容器高度为视口高度 */
-    /* height: 227px;
-    width: 400px; */
+
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -83,6 +86,7 @@ export default {
     /* 去掉标题的默认上下边距 */
     font-size: 40px;
 }
+
 .radius {
     height: 300px;
     width: 400px;
@@ -92,10 +96,12 @@ export default {
     margin-top: 270px;
     box-shadow: var(--el-box-shadow-lighter);
 }
+
 .login-container {
     margin-top: 45px;
     display: flex;
     justify-content: center;
     align-items: center;
-}</style>
+}
+</style>
   
